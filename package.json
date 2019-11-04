@@ -19,6 +19,8 @@
     "jsonwebtoken": "^8.5.1",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
-    "passport-local": "^1.0.0"
+    "passport-local": "^1.0.0",
+    "simple-crypto-js": "^2.2.0",
+    "websocket": "^1.0.30"
   }
 }

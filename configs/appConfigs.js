@@ -5,3 +5,4 @@ exports.AWS_CONFIGS = {
     'secretAccessKey': process.env.SECRECT_ACCESS_KEY
 }
 exports.JWT_SECRET = process.env.JWT_SECRET;
+exports.ENCODE_KEY = process.env.ENCODE_KEY;
