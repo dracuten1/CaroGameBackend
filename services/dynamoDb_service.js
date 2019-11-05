@@ -23,11 +23,16 @@ module.exports = {
             } catch (err) {
 
             }
+            const item={
+                id:user.name,
+                password:user.pass,
+                type:user.type,
+                email:user.email,
+            }
             const putParams = {
                 TableName: "user",
                 Item: {
-                    id: user.name,
-                    password: user.pass
+                    ...item
                 },
             }
             // console.log(putParams)

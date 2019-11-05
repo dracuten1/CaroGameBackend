@@ -2,32 +2,59 @@ const passport = require('passport');
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
-const { JWT_SECRET } = require('../configs/appConfigs');
-// const LocalStrategy = require('passport-local').Strategy;
-// passport.use(new LocalStrategy({
-//         usernameField: 'email',
-//         passwordField: 'password'
-//     }, 
-//     function (email, password, cb) {
-//         //this one is typically a DB call. Assume that the returned user object is pre-formatted and ready for storing in JWT
-//         return UserModel.findOne({email, password})
-//            .then(user => {
-//                if (!user) {
-//                    return cb(null, false, {message: 'Incorrect email or password.'});
-//                }
-//                return cb(null, user, {message: 'Logged In Successfully'});
-//           })
-//           .catch(err => cb(err));
-//     }
-// ));
+const config = require('../configs/appConfigs');
+const GoogleTokenStrategy = require('passport-google-token').Strategy;
+const FacebookTokenStrategy = require('passport-facebook-token');
+const dbService = require('../services/dynamoDb_service');
+
 passport.use(new JWTStrategy({
     jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
-    secretOrKey: JWT_SECRET
+    secretOrKey: config.JWT_SECRET
 },
     function (jwtPayload, cb) {
         const user = {
-            name:jwtPayload
+            name: jwtPayload
         }
         return cb(null, user);
     }
 ));
+
+passport.use(new GoogleTokenStrategy({
+    clientID: config.GOOGLE_CLIENT_ID,
+    clientSecret: config.GOOGLE_CLIENT_SECRET
+},
+    function (accessToken, refreshToken, profile, done) {
+        console.log(profile);
+        const user = {
+            name: profile.displayName,
+            id: profile.emails[0].value,
+            email: profile.emails[0].value,
+            type: 'google'
+        }
+        console.log(user);
+        dbService.add(user).then(data => {
+            return done(null, user);
+        }).catch(err => {
+            return done(null, user);
+        });
+    }));
+
+passport.use(new FacebookTokenStrategy({
+    clientID: config.FB_CLIENT_ID,
+    clientSecret: config.FB_CLIENT_SECRET
+},
+    function (accessToken, refreshToken, profile, done) {
+        console.log(profile);
+        const user = {
+            name: profile.displayName,
+            id: profile.emails[0].value,
+            email: profile.emails[0].value,
+            type: 'facebook'
+        }
+        console.log(user);
+        dbService.add(user).then(data => {
+            return done(null, user);
+        }).catch(err => {
+            return done(null, user);
+        });
+    }));
